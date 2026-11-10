@@ -43,14 +43,11 @@ export async function importAdvFeed(db: Db, source: string) {
   let listingsCreated = 0;
   let batch: AdvFirm[] = [];
 
-  const flush = async () => {
-    if (!batch.length) return;
-    // A CRD can't be upserted twice in one statement; keep the last occurrence.
-    const rows = [...new Map(batch.map((f) => [f.crd, f])).values()];
-    batch = [];
-    const saved = await db
+  type SavedFirm = { id: string; crd: number; name: string; flatFeeCandidate: boolean };
+  const upsertFirms = (batchRows: AdvFirm[]): Promise<SavedFirm[]> =>
+    db
       .insert(firms)
-      .values(rows.map((f) => ({ ...f, lastImportRunId: run.id })))
+      .values(batchRows.map((f) => ({ ...f, lastImportRunId: run.id })))
       .onConflictDoUpdate({
         target: firms.crd,
         set: {
@@ -80,6 +77,27 @@ export async function importAdvFeed(db: Db, source: string) {
         },
       })
       .returning({ id: firms.id, crd: firms.crd, name: firms.name, flatFeeCandidate: firms.flatFeeCandidate });
+
+  const flush = async () => {
+    if (!batch.length) return;
+    // A CRD can't be upserted twice in one statement; keep the last occurrence.
+    const rows = [...new Map(batch.map((f) => [f.crd, f])).values()];
+    batch = [];
+    let saved: SavedFirm[];
+    try {
+      saved = await upsertFirms(rows);
+    } catch {
+      // One bad row fails the whole statement. Retry one by one so the rest
+      // still load, and record which firms were skipped.
+      saved = [];
+      for (const row of rows) {
+        try {
+          saved.push(...(await upsertFirms([row])));
+        } catch (err) {
+          errors.push(`CRD ${row.crd}: ${((err as { cause?: Error }).cause ?? (err as Error)).message}`);
+        }
+      }
+    }
     upserted += saved.length;
 
     const candidates = saved.filter((f) => f.flatFeeCandidate);

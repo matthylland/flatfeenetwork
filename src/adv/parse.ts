@@ -111,6 +111,16 @@ const int = (v: string | undefined) => {
   const n = Number(v.replace(/[^0-9.]/g, ""));
   return Number.isFinite(n) && v.trim() !== "" ? Math.round(n) : null;
 };
+/** Firms sometimes type a dollar amount into a count box; treat absurd counts as unknown. */
+const MAX_COUNT = 10_000_000;
+const count = (v: string | undefined) => {
+  const n = int(v);
+  return n !== null && n >= 0 && n <= MAX_COUNT ? n : null;
+};
+const dollars = (v: string | undefined) => {
+  const n = int(v);
+  return n !== null && n >= 0 && Number.isSafeInteger(n) ? n : null;
+};
 const stateCode = (v: string | undefined) => {
   const s = str(v)?.toUpperCase();
   return s && /^[A-Z]{2}$/.test(s) ? s : null;
@@ -170,9 +180,9 @@ export function mapFirm(firm: XmlNode): AdvFirm {
     noticeFiledStates: uniq(noticeFiled.map((s) => stateCode(s.attrs.RgltrCd))),
     feeFlags,
     flatFeeCandidate: isFlatFeeCandidate(feeFlags),
-    assetsUnderManagement: int(find(firm, "Item5F")?.attrs.Q5F2C),
-    clientCount: int(find(firm, "Item5C")?.attrs.Q5C1),
-    employeeCount: int(find(firm, "Item5A")?.attrs.TtlEmp),
+    assetsUnderManagement: dollars(find(firm, "Item5F")?.attrs.Q5F2C),
+    clientCount: count(find(firm, "Item5C")?.attrs.Q5C1),
+    employeeCount: count(find(firm, "Item5A")?.attrs.TtlEmp),
     hasDisclosures,
     advFilingDate: str(filing?.attrs.Dt),
   };

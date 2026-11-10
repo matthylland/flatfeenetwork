@@ -35,4 +35,12 @@ describe.skipIf(!url)("importAdvFeed (database)", () => {
     const [aumOnly] = await db.select().from(firms).where(eq(firms.crd, 100003));
     expect(aumOnly.flatFeeCandidate).toBe(false);
   });
+
+  it("skips a firm the database rejects and still loads the rest of the batch", async () => {
+    const r = await importAdvFeed(db, "test/fixtures/adv-bad-values.xml");
+    expect(r).toMatchObject({ seen: 3, upserted: 2, listingsCreated: 2 });
+    expect(r.errors).toEqual([expect.stringMatching(/^CRD 99999999999: .*out of range/)]);
+    const [big] = await db.select().from(firms).where(eq(firms.crd, 200001));
+    expect(big).toMatchObject({ clientCount: null, assetsUnderManagement: 2356471235 });
+  });
 });
