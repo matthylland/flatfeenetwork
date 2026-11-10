@@ -11,6 +11,7 @@ import sax from "sax";
 import type { Readable } from "node:stream";
 import type { AdvFeeFlags } from "@/db/schema";
 import { xmlTextDecoder } from "./decode";
+import { pickFirmWebsite } from "./web";
 
 export type XmlNode = { name: string; attrs: Record<string, string>; children: XmlNode[]; text: string };
 
@@ -162,7 +163,8 @@ export function mapFirm(firm: XmlNode): AdvFirm {
   const item11 = find(firm, "Item11");
   const hasDisclosures = item11 ? Object.values(item11.attrs).some((v) => yes(v)) || item11.children.some((c) => Object.values(c.attrs).some((v) => yes(v))) : null;
 
-  const website = findAll(firm, "WebAddr").map((w) => str(w.text)).find(Boolean) ?? null;
+  // Social media pages and vendor portals are skipped; only the firm's own site counts.
+  const website = pickFirmWebsite(findAll(firm, "WebAddr").map((w) => str(w.text)));
 
   return {
     crd,
