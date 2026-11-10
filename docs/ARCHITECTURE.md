@@ -26,7 +26,7 @@ Written and recorded answers are identical from layer 3 down, so matching never 
 
 ## Form ADV import
 
-`src/adv/parse.ts` streams the SEC firm compilation feed, one `<Firm>` at a time. `mapFirm` is the only function that knows the feed's element names. `src/adv/import.ts` upserts firms by CRD and creates one unclaimed listing for each flat-fee candidate: a firm filing fixed, hourly or subscription fees (Form ADV Item 5.E). Firms that also charge a percentage of assets are listed; claiming confirms which fee is primary. Existing listings are never overwritten by the import.
+`src/adv/parse.ts` streams the SEC firm compilation feed, one `<Firm>` at a time. `mapFirm` is the only function that knows the feed's element names. `src/adv/import.ts` upserts firms by CRD and creates one unclaimed listing for each flat-fee candidate (`isFlatFeeCandidate`): a firm filing fixed, hourly or subscription fees (Form ADV Item 5.E) that either doesn't check the percentage-of-assets box or reports no assets under management. Firms with real AUM that charge on assets mostly charge on assets, so they are listed only after they claim a profile and it is approved. Existing listings are never overwritten by the import.
 
 ## Matching (`src/matching`)
 

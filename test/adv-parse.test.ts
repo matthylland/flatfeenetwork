@@ -1,6 +1,6 @@
 import { createReadStream } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { parseAdvFeed, type AdvFirm } from "@/adv/parse";
+import { isFlatFeeCandidate, parseAdvFeed, type AdvFirm } from "@/adv/parse";
 import { slugFor } from "@/adv/import";
 
 async function parseFixture() {
@@ -37,7 +37,8 @@ describe("parseAdvFeed", () => {
       advFilingDate: "2026-03-28",
     });
     expect(f.feeFlags).toMatchObject({ pctAum: true, fixed: true, hourly: false });
-    expect(f.flatFeeCandidate).toBe(true);
+    // Checks the percentage-of-assets box and manages real assets: no automatic listing.
+    expect(f.flatFeeCandidate).toBe(false);
   });
 
   it("maps a state-registered firm and normalizes state codes", async () => {
@@ -53,6 +54,19 @@ describe("parseAdvFeed", () => {
   it("does not treat an AUM-only firm as flat fee", async () => {
     const f = (await parseFixture()).firms[2];
     expect(f.flatFeeCandidate).toBe(false);
+  });
+});
+
+describe("isFlatFeeCandidate", () => {
+  const none = { pctAum: false, hourly: false, subscription: false, fixed: false, commissions: false, performance: false, other: false };
+  it("lists flat-fee firms that don't charge on assets, or that check the box but manage nothing", () => {
+    expect(isFlatFeeCandidate({ ...none, fixed: true }, 5_000_000)).toBe(true);
+    expect(isFlatFeeCandidate({ ...none, hourly: true, pctAum: true }, 0)).toBe(true);
+    expect(isFlatFeeCandidate({ ...none, subscription: true, pctAum: true }, null)).toBe(true);
+  });
+  it("leaves out firms with real assets under management that charge on assets, and firms with no flat fee", () => {
+    expect(isFlatFeeCandidate({ ...none, fixed: true, pctAum: true }, 185_000_000)).toBe(false);
+    expect(isFlatFeeCandidate({ ...none, other: true }, 0)).toBe(false);
   });
 });
 
