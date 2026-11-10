@@ -61,3 +61,21 @@ describe("slugFor", () => {
     expect(slugFor({ name: "Smith & Jones Financial, LLC", crd: 42 })).toBe("smith-jones-financial-llc-42");
   });
 });
+
+describe("feed encoding", () => {
+  it("reads an ISO-8859-1, gzipped feed like the SEC publishes", async () => {
+    const { openFeed } = await import("@/adv/import");
+    const firms: AdvFirm[] = [];
+    const { seen } = await parseAdvFeed(await openFeed("test/fixtures/adv-latin1.xml.gz"), (f) => void firms.push(f));
+    expect(seen).toBe(1);
+    expect(firms[0].name).toBe("Café Français Planning");
+    expect(firms[0].city).toBe("San José");
+  });
+
+  it("reads the encoding from the XML declaration", async () => {
+    const { declaredEncoding } = await import("@/adv/decode");
+    expect(declaredEncoding('<?xml version="1.0" encoding="ISO-8859-1"?><a/>')).toBe("ISO-8859-1");
+    expect(declaredEncoding("<?xml version='1.0'?><a/>")).toBeNull();
+    expect(declaredEncoding("<a/>")).toBeNull();
+  });
+});
