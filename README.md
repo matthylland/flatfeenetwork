@@ -25,11 +25,12 @@ npm run dev
 | Command | What it does |
 | --- | --- |
 | `npm run dev` | Start the app locally |
-| `npm test` | Unit tests. Set `TEST_DATABASE_URL` to also run the database tests (they wipe `firms` and `profiles`) |
+| `npm test` | Unit tests. Set `TEST_DATABASE_URL` to also run the database tests (they empty every table, so use a throwaway database) |
 | `npm run typecheck` / `npm run lint` | Static checks |
 | `npm run db:generate` | Create a migration after editing `src/db/schema.ts` |
 | `npm run db:migrate` | Apply migrations |
 | `npm run import:adv -- <file-or-url> ...` | Import Form ADV firm feeds (`.xml` or `.xml.gz`) |
+| `npm run seed:demo` | Add 6 fictional claimed advisors to try the questionnaire (local or preview databases only) |
 
 ## Deploying on Railway
 

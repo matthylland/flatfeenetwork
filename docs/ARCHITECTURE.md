@@ -38,3 +38,7 @@ Written and recorded answers are identical from layer 3 down, so matching never 
 4. **Feedback** (`feedback.ts`): each "not for me" reason adjusts the constraints for the next round, and the advisor is excluded from later rounds.
 
 Tests in `test/matching.test.ts` pin the product rules, including identical scores for a paid and a free profile with identical facts.
+
+## Prospect flow (`src/prospect`, `src/app/match`)
+
+`/match` is the questionnaire. Submitting it creates an anonymous `prospect_sessions` row, stores each answer with its question version, runs round 1 and redirects to `/match/<session>`. On the results page the prospect reacts to each card (Interested, or Not for me with a reason). "Show me 3 more" builds the next round: every "not for me" reason from the current round adjusts the constraints, and everyone already shown is excluded. Each round's constraints and scorer version are stored on `match_sets`; each match logs a `matched` event and each filtered-out claimed advisor a `missed_match` event for advisor analytics.
