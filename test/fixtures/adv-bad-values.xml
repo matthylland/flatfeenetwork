@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hand-written sample with values real filings sometimes contain. Not real firms. -->
+<IAPDFirmSECReport GenOn="2026-11-01">
+  <Firms>
+    <Firm>
+      <Info FirmCrdNb="200001" BusNm="Dollar In Count Box LLC"/>
+      <MainAddr City="Miami" State="FL"/>
+      <FormInfo><Part1A>
+        <Item5A TtlEmp="12"/>
+        <Item5C Q5C1="2356471235"/>
+        <Item5E Q5E1="N" Q5E2="N" Q5E3="N" Q5E4="Y" Q5E5="N" Q5E6="N" Q5E7="N"/>
+        <Item5F Q5F2C="2356471235"/>
+      </Part1A></FormInfo>
+    </Firm>
+    <Firm>
+      <Info FirmCrdNb="99999999999" BusNm="Out Of Range CRD"/>
+      <FormInfo><Part1A><Item5E Q5E4="Y"/></Part1A></FormInfo>
+    </Firm>
+    <Firm>
+      <Info FirmCrdNb="200003" BusNm="Ordinary Hourly Firm"/>
+      <FormInfo><Part1A><Item5E Q5E2="Y"/></Part1A></FormInfo>
+    </Firm>
+  </Firms>
+</IAPDFirmSECReport>

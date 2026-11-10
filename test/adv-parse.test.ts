@@ -78,4 +78,10 @@ describe("feed encoding", () => {
     expect(declaredEncoding("<?xml version='1.0'?><a/>")).toBeNull();
     expect(declaredEncoding("<a/>")).toBeNull();
   });
+
+  it("treats an absurd count as unknown but keeps large asset totals", async () => {
+    const firms: AdvFirm[] = [];
+    await parseAdvFeed(createReadStream("test/fixtures/adv-bad-values.xml"), (f) => void firms.push(f));
+    expect(firms[0]).toMatchObject({ crd: 200001, clientCount: null, employeeCount: 12, assetsUnderManagement: 2356471235 });
+  });
 });
