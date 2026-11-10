@@ -47,4 +47,12 @@ Tests in `test/matching.test.ts` pin the product rules, including identical scor
 
 `/advisors` searches live listings of flat-fee firms by name, city or CRD, sorted by name. Tier never changes the order. `/advisors/<slug>` shows the advisor's confirmed facts (`src/directory/format.ts` decides which fields are public; location and excluded states never are) and the firm's Form ADV data, and logs a `profile_view` event. A view or contact is credited to a match only when the match really belongs to that profile and session; any other `m`/`s` link parameters are ignored.
 
-Only claimed profiles take messages. A message is stored in `contact_requests` and logged as a `contact` event; delivering it to the advisor by email is not built yet (`delivered_at` stays empty). Unclaimed listings show the firm's website and phone instead.
+Only claimed profiles take messages. A message is stored in `contact_requests`, logged as a `contact` event, and emailed to the profile's owner with the prospect as reply-to (`delivered_at` is set once sent). Unclaimed listings show the firm's website and phone instead.
+
+## Claims and advisor sign-in (`src/claims`, `src/auth`, `src/advisor`)
+
+Advisors sign in with a 6-digit code sent by email; codes and session tokens are stored only as hashes. `/claim` takes a CRD, name, role and work email. After the code is confirmed, the claim is approved at once if the email's domain matches the firm's website and the listing is unclaimed. Everything else (webmail addresses, firms without a listing, firms not yet in the SEC data, listings someone already owns) waits for the site owner (`ADMIN_EMAIL`) at `/admin/claims`. Approving a firm with no listing creates one, so a firm that filed its flat fee as "other" can still be listed. Any claimed profile is shown and matched whatever its ADV fee flags.
+
+Claimed advisors fill in the short form at `/advisor/<profileId>`: fee range, what the fee covers, advice only / investment management, meeting formats, top 3 services, asset minimum, intro and booking link. Each answer is saved as a confirmed `advisor_form` fact.
+
+Email goes through Resend (`src/email`). Without `RESEND_API_KEY`, emails are logged instead of sent.

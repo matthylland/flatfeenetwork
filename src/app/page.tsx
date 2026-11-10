@@ -15,6 +15,10 @@ export default function Home() {
           Or browse all advisors
         </Link>
       </div>
+      <p className="mt-8 text-sm opacity-70">
+        Are you a flat-fee advisor? <Link href="/claim" className="underline">Claim or add your free profile</Link> or{" "}
+        <Link href="/advisor/sign-in" className="underline">sign in</Link>.
+      </p>
     </main>
   );
 }
