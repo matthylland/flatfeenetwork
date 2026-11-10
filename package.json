@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
-    "import:adv": "tsx scripts/import-adv.ts"
+    "import:adv": "tsx scripts/import-adv.ts",
+    "seed:demo": "tsx scripts/seed-demo.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
@@ -20,6 +21,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "sax": "^1.6.1",
+    "tsx": "^4.23.15",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -33,7 +35,6 @@
     "eslint": "^9",
     "eslint-config-next": "^16.4.6",
     "tailwindcss": "^4",
-    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.1.0"
   },
