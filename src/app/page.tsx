@@ -7,9 +7,14 @@ export default function Home() {
       <p className="text-lg">
         Answer a few questions and meet three flat-fee financial advisors matched to your situation.
       </p>
-      <Link href="/match" className="self-start rounded-md bg-blue-600 px-5 py-2.5 font-medium text-white">
-        Find my advisor
-      </Link>
+      <div className="flex flex-wrap items-center gap-4">
+        <Link href="/match" className="rounded-md bg-blue-600 px-5 py-2.5 font-medium text-white">
+          Find my advisor
+        </Link>
+        <Link href="/advisors" className="underline">
+          Or browse all advisors
+        </Link>
+      </div>
     </main>
   );
 }
