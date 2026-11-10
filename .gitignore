@@ -147,3 +147,16 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# from create-next-app
+/node_modules
+/.pnp
+/coverage
+/.next/
+/out/
+/build
+.DS_Store
+*.pem
+.pnpm-debug.log*
+.vercel
+next-env.d.ts
