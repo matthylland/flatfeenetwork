@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Hand-written sample in the layout of the SEC IA firm compilation feeds. Not real firms. -->
+<IAPDFirmSECReport GenOn="2026-11-01">
+  <Firms>
+    <Firm>
+      <Info SECRgnCD="MIRO" FirmCrdNb="100001" SECNb="801-00001" BusNm="Example Planning LLC" LegalNm="EXAMPLE PLANNING LLC"/>
+      <MainAddr Strt1="1 Main St" Strt2="Suite 2" City="Austin" State="TX" Cntry="United States" PostlCd="78701" PhNb="512-555-0100"/>
+      <Rgstn FirmType="Registered" St="APPROVED" Dt="2015-01-02"/>
+      <NoticeFiled>
+        <States RgltrCd="TX" St="NOTICE FILED" Dt="2015-01-02"/>
+        <States RgltrCd="CA" St="NOTICE FILED" Dt="2016-03-04"/>
+      </NoticeFiled>
+      <Filing Dt="2026-03-28" FormVrsn="10/2021"/>
+      <FormInfo>
+        <Part1A>
+          <Item1><WebAddrs><WebAddr>https://example-planning.test</WebAddr></WebAddrs></Item1>
+          <Item5A TtlEmp="4"/>
+          <Item5C Q5C1="120"/>
+          <Item5E Q5E1="Y" Q5E2="N" Q5E3="N" Q5E4="Y" Q5E5="N" Q5E6="N" Q5E7="N"/>
+          <Item5F Q5F2C="185000000"/>
+          <Item11 Q11="N" Q11A1="N"/>
+        </Part1A>
+      </FormInfo>
+    </Firm>
+    <Firm>
+      <Info FirmCrdNb="100002" BusNm="Hourly Advice Co"/>
+      <MainAddr City="Denver" State="co" PostlCd="80202"/>
+      <StateRgstn RgltrCd="CO" St="APPROVED" Dt="2020-05-06"/>
+      <StateRgstn RgltrCd="WY" St="APPROVED" Dt="2021-05-06"/>
+      <FormInfo>
+        <Part1A>
+          <Item5E Q5E1="N" Q5E2="Y" Q5E3="Y" Q5E4="N" Q5E5="N" Q5E6="N" Q5E7="Y" Q5E7Oth="Project-based plans"/>
+          <Item11><Item11A Q11A1="Y"/></Item11>
+        </Part1A>
+      </FormInfo>
+    </Firm>
+    <Firm>
+      <Info SECRgnCD="NYRO" FirmCrdNb="100003" BusNm="AUM Only Wealth"/>
+      <MainAddr City="New York" State="NY"/>
+      <Rgstn FirmType="Registered" St="APPROVED"/>
+      <FormInfo><Part1A><Item5E Q5E1="Y" Q5E2="N" Q5E3="N" Q5E4="N"/></Part1A></FormInfo>
+    </Firm>
+    <Firm>
+      <Info BusNm="Broken Record Firm"/>
+    </Firm>
+  </Firms>
+</IAPDFirmSECReport>
