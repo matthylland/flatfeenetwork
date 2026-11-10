@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb } from "@/db";
 import { currentMatches } from "@/prospect/session";
@@ -31,7 +32,11 @@ export default async function MatchResults({ params }: { params: Promise<{ sessi
             <li key={match.id} className="rounded-lg border border-black/10 p-5 dark:border-white/15">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-medium">{profile.displayName}</h2>
+                  <h2 className="text-xl font-medium">
+                    <Link href={`/advisors/${profile.slug}?m=${match.id}&s=${sessionId}`} className="hover:underline">
+                      {profile.displayName}
+                    </Link>
+                  </h2>
                   <p className="text-sm opacity-70">{[firm.city, firm.state].filter(Boolean).join(", ")}</p>
                 </div>
                 <p className="text-right font-medium">

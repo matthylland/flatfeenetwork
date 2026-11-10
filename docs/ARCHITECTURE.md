@@ -42,3 +42,9 @@ Tests in `test/matching.test.ts` pin the product rules, including identical scor
 ## Prospect flow (`src/prospect`, `src/app/match`)
 
 `/match` is the questionnaire. Submitting it creates an anonymous `prospect_sessions` row, stores each answer with its question version, runs round 1 and redirects to `/match/<session>`. On the results page the prospect reacts to each card (Interested, or Not for me with a reason). "Show me 3 more" builds the next round: every "not for me" reason from the current round adjusts the constraints, and everyone already shown is excluded. Each round's constraints and scorer version are stored on `match_sets`; each match logs a `matched` event and each filtered-out claimed advisor a `missed_match` event for advisor analytics.
+
+## Browse and profiles (`src/directory`, `src/app/advisors`)
+
+`/advisors` searches live listings of flat-fee firms by name, city or CRD, sorted by name. Tier never changes the order. `/advisors/<slug>` shows the advisor's confirmed facts (`src/directory/format.ts` decides which fields are public; location and excluded states never are) and the firm's Form ADV data, and logs a `profile_view` event. A view or contact is credited to a match only when the match really belongs to that profile and session; any other `m`/`s` link parameters are ignored.
+
+Only claimed profiles take messages. A message is stored in `contact_requests` and logged as a `contact` event; delivering it to the advisor by email is not built yet (`delivered_at` stays empty). Unclaimed listings show the firm's website and phone instead.
