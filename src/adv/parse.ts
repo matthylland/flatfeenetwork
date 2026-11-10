@@ -10,6 +10,7 @@
 import sax from "sax";
 import type { Readable } from "node:stream";
 import type { AdvFeeFlags } from "@/db/schema";
+import { xmlTextDecoder } from "./decode";
 
 export type XmlNode = { name: string; attrs: Record<string, string>; children: XmlNode[]; text: string };
 
@@ -78,7 +79,13 @@ export function parseAdvFeed(
     });
     parser.on("error", reject);
     parser.on("end", () => pending.then(() => resolve({ seen }), reject));
-    input.pipe(parser);
+    // Decode bytes ourselves (the SEC feeds are ISO-8859-1) and hand sax text.
+    const text = input.pipe(xmlTextDecoder());
+    text.setEncoding("utf8");
+    text.on("error", reject);
+    input.on("error", reject);
+    text.on("data", (chunk: string) => parser.write(chunk));
+    text.on("end", () => parser.end());
   });
 }
 
