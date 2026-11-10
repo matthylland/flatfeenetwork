@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb } from "@/db";
+import { isNotFirmWebsite } from "@/adv/web";
 import { displayFacts, money } from "@/directory/format";
 import { advFeeTypes, canReceiveMessages, getProfile, recordProfileView } from "@/directory/profiles";
 import { ContactForm } from "./contact-form";
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 }
 
 const safeUrl = (u: string | null) => {
-  if (!u) return null;
+  if (!u || isNotFirmWebsite(u)) return null;
   const withScheme = /^https?:\/\//i.test(u) ? u : `https://${u}`;
   try {
     const url = new URL(withScheme);

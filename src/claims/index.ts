@@ -15,29 +15,22 @@ import { claimRequests, firms, profiles, users } from "@/db/schema";
 import { slugFor } from "@/adv/import";
 import { findOrCreateUser, normalizeEmail, sendCode, verifyCode } from "@/auth";
 import { sendEmail, siteUrl } from "@/email";
+import { hostOf, isNotFirmWebsite } from "@/adv/web";
 
 /** Webmail domains never count as a firm's own domain. */
 const FREE_MAIL = new Set([
   "gmail.com", "googlemail.com", "yahoo.com", "outlook.com", "hotmail.com", "live.com", "msn.com", "aol.com",
   "icloud.com", "me.com", "mac.com", "proton.me", "protonmail.com", "gmx.com", "mail.com", "zoho.com", "yandex.com",
 ]);
-/** Website hosts that belong to someone else, so they prove nothing about the firm. */
-const SHARED_HOSTS = /(^|\.)(linkedin\.com|twitter\.com|x\.com|facebook\.com|instagram\.com|youtube\.com|wixsite\.com|squarespace\.com|godaddysites\.com|tamaracinc\.com|wealthbox\.com|google\.com)$/;
-
-const hostOf = (website: string) => {
-  try {
-    return new URL(/^https?:\/\//i.test(website) ? website : `https://${website}`).hostname.toLowerCase().replace(/^www\./, "");
-  } catch {
-    return null;
-  }
-};
+/** Hosted-site builders: the site may be the firm's, but the domain isn't. */
+const SITE_BUILDERS = /(^|\.)(wixsite\.com|squarespace\.com|godaddysites\.com|wordpress\.com|weebly\.com)$/;
 
 /** True when the email's domain is the firm's own website domain (or a subdomain of it). */
 export function emailMatchesWebsite(email: string, website: string | null): boolean {
   const domain = normalizeEmail(email).split("@")[1];
   if (!domain || FREE_MAIL.has(domain) || !website) return false;
   const host = hostOf(website);
-  if (!host || SHARED_HOSTS.test(host)) return false;
+  if (!host || isNotFirmWebsite(website) || SITE_BUILDERS.test(host)) return false;
   return domain === host || domain.endsWith(`.${host}`) || host.endsWith(`.${domain}`);
 }
 
