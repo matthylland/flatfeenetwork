@@ -157,6 +157,8 @@ export function mapFirm(firm: XmlNode): AdvFirm {
     ...(str(e.Q5E7Oth) ? { otherDescription: str(e.Q5E7Oth)! } : {}),
   };
 
+  const assetsUnderManagement = dollars(find(firm, "Item5F")?.attrs.Q5F2C);
+
   const item11 = find(firm, "Item11");
   const hasDisclosures = item11 ? Object.values(item11.attrs).some((v) => yes(v)) || item11.children.some((c) => Object.values(c.attrs).some((v) => yes(v))) : null;
 
@@ -179,8 +181,8 @@ export function mapFirm(firm: XmlNode): AdvFirm {
     registeredStates: uniq(stateRgstns.map((r) => stateCode(r.attrs.RgltrCd))),
     noticeFiledStates: uniq(noticeFiled.map((s) => stateCode(s.attrs.RgltrCd))),
     feeFlags,
-    flatFeeCandidate: isFlatFeeCandidate(feeFlags),
-    assetsUnderManagement: dollars(find(firm, "Item5F")?.attrs.Q5F2C),
+    flatFeeCandidate: isFlatFeeCandidate(feeFlags, assetsUnderManagement),
+    assetsUnderManagement,
     clientCount: count(find(firm, "Item5C")?.attrs.Q5C1),
     employeeCount: count(find(firm, "Item5A")?.attrs.TtlEmp),
     hasDisclosures,
@@ -189,10 +191,14 @@ export function mapFirm(firm: XmlNode): AdvFirm {
 }
 
 /**
- * Flat fee = any fee that is not a percentage of assets. A firm qualifies for a
- * listing if it files any of fixed, hourly or subscription fees. Firms that
- * also charge % of AUM are still listed; claiming confirms which is primary.
+ * Who gets an automatic (unclaimed) listing. Flat fee = any fee that is not a
+ * percentage of assets, so the firm must file fixed, hourly or subscription
+ * fees. Matt decided (2026-11-10) that firms which also check the
+ * percentage-of-assets box are listed only if they report no assets under
+ * management: most firms with real AUM charge mainly on assets. Those firms
+ * can still claim a profile and be listed after review.
  */
-export function isFlatFeeCandidate(f: AdvFeeFlags): boolean {
-  return f.fixed || f.hourly || f.subscription;
+export function isFlatFeeCandidate(f: AdvFeeFlags, assetsUnderManagement: number | null = null): boolean {
+  const flatFee = f.fixed || f.hourly || f.subscription;
+  return flatFee && (!f.pctAum || !assetsUnderManagement);
 }

@@ -378,3 +378,56 @@ export const advImportRuns = pgTable("adv_import_runs", {
   listingsCreated: integer("listings_created").notNull().default(0),
   errors: jsonb("errors").$type<string[]>().notNull().default(sql`'[]'::jsonb`),
 });
+
+// ---------------------------------------------------------------------------
+// Advisor sign-in and claims
+// ---------------------------------------------------------------------------
+
+/** One-time email codes. Only a hash of the code is stored. */
+export const emailCodes = pgTable(
+  "email_codes",
+  {
+    id: id(),
+    email: text("email").notNull(),
+    codeHash: text("code_hash").notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("email_codes_email_idx").on(sql`lower(${t.email})`, t.createdAt)],
+);
+
+/** Signed-in advisor sessions. The cookie holds the token; only its hash is stored. */
+export const userSessions = pgTable("user_sessions", {
+  tokenHash: text("token_hash").primaryKey(),
+  userId: uuid("user_id").notNull().references(() => users.id),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: createdAt(),
+});
+
+export const claimStatusEnum = pgEnum("claim_status", ["awaiting_code", "pending_review", "approved", "rejected"]);
+
+/**
+ * A request to claim a listing, or to be listed ("Get listed"). Approved
+ * automatically when the verified email's domain matches the firm's website;
+ * otherwise reviewed by hand at /admin/claims.
+ */
+export const claimRequests = pgTable(
+  "claim_requests",
+  {
+    id: id(),
+    crd: integer("crd").notNull(),
+    profileId: uuid("profile_id").references(() => profiles.id),
+    email: text("email").notNull(),
+    name: text("name").notNull(),
+    role: text("role").notNull(),
+    note: text("note"),
+    status: claimStatusEnum("status").notNull().default("awaiting_code"),
+    domainMatch: boolean("domain_match").notNull().default(false),
+    userId: uuid("user_id").references(() => users.id),
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("claim_requests_status_idx").on(t.status, t.createdAt)],
+);

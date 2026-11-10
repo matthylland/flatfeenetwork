@@ -63,7 +63,13 @@ export default async function AdvisorProfile({ params, searchParams }: Params) {
           <p>
             <strong>Unverified.</strong> Built from this firm&apos;s public SEC filings. The advisor hasn&apos;t confirmed it yet.
           </p>
-          <p className="mt-2">Is this your firm? Free profile claiming opens soon.</p>
+          <p className="mt-2">
+            Is this your firm?{" "}
+            <Link href={`/claim?crd=${firm.crd}`} className="font-medium underline">
+              Claim this profile for free
+            </Link>
+            .
+          </p>
         </div>
       )}
 

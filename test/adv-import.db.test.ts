@@ -21,7 +21,7 @@ describe.skipIf(!url)("importAdvFeed (database)", () => {
 
   it("upserts firms and creates one unclaimed listing per flat-fee firm, idempotently", async () => {
     const first = await importAdvFeed(db, "test/fixtures/adv-sample.xml");
-    expect(first).toMatchObject({ seen: 4, upserted: 3, listingsCreated: 2 });
+    expect(first).toMatchObject({ seen: 4, upserted: 3, listingsCreated: 1 });
     expect(first.errors).toHaveLength(1);
 
     const second = await importAdvFeed(db, "test/fixtures/adv-sample.xml");
@@ -29,7 +29,7 @@ describe.skipIf(!url)("importAdvFeed (database)", () => {
 
     expect(await db.select().from(firms)).toHaveLength(3);
     const listings = await db.select().from(profiles);
-    expect(listings).toHaveLength(2);
+    expect(listings).toHaveLength(1);
     expect(listings.every((l) => l.tier === "unclaimed")).toBe(true);
 
     const [aumOnly] = await db.select().from(firms).where(eq(firms.crd, 100003));

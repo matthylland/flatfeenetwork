@@ -1,4 +1,5 @@
 import { and, eq, inArray } from "drizzle-orm";
+import { listedWhere } from "@/directory/profiles";
 import type { Db } from "@/db/client";
 import { extractedFacts, firms, profiles } from "@/db/schema";
 import type { AdvisorCandidate, AdvisorFacts } from "./types";
@@ -19,7 +20,7 @@ export async function loadCandidates(db: Db): Promise<AdvisorCandidate[]> {
     .select({ id: profiles.id, tier: profiles.tier, clientCount: firms.clientCount })
     .from(profiles)
     .innerJoin(firms, eq(firms.id, profiles.firmId))
-    .where(and(eq(profiles.isLive, true), eq(firms.flatFeeCandidate, true)));
+    .where(listedWhere);
 
   const facts = await db
     .select({ profileId: extractedFacts.profileId, fieldKey: extractedFacts.fieldKey, value: extractedFacts.value })
